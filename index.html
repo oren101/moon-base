@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#03050c" />
+  <title>בסיס הירח של אורן</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <canvas id="c"></canvas>
+    <div class="hud">
+      <div class="top">
+        <div class="pill"><span>בסיס הירח של אורן</span> <span class="live" id="liveDot">● Live</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div class="pill" id="workingPill">● 0 עובדים</div>
+          <button class="pill" id="waitingPill" type="button">● 0 מחכים</button>
+        </div>
+      </div>
+      <div class="eclipse-box">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="eclipseToggle" />
+          <span>ליקוי</span>
+        </label>
+      </div>
+      <div class="floors" id="floorPicker"></div>
+      <div class="toast" id="toast">
+        <div class="dot" id="toastDot"></div>
+        <div class="txt">
+          <div class="title" id="toastTitle">ים השלווה</div>
+          <div class="body" id="toastBody">כל הקומות פעילות · בסיס אורן</div>
+        </div>
+        <button class="approve" id="approveBtn" type="button" style="display:none">אשר</button>
+      </div>
+      <div class="panel" id="botPanel" style="display:none" dir="rtl">
+        <h3 id="panelName"></h3>
+        <div class="role" id="panelRole"></div>
+        <div class="status" id="panelStatus"></div>
+        <div class="line" id="panelLine"></div>
+        <button class="close" id="panelClose" type="button">סגור</button>
+      </div>
+    </div>
+    <div class="foot">בסיס פרטי של אורן שיש · ים השלווה · לא משטח רשמי</div>
+  </div>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
