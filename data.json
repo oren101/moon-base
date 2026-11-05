@@ -3,13 +3,13 @@
   "sign": "OREN · MOON BASE",
   "updatedAt": "5.11.2026 21:48",
   "workingCount": 1,
-  "waitingCount": 8,
+  "waitingCount": 7,
   "floors": [
     {
       "id": "cmd",
       "num": 5,
       "name": "פיקוד ותזמור",
-      "depthLabel": "Mission Control · -6 m",
+      "depthLabel": "6 m-",
       "bots": [
         {
           "id": "albus",
@@ -59,13 +59,15 @@
             "y": 0.28
           }
         }
-      ]
+      ],
+      "toastLine": "קומה 5 · פיקוד ותזמור",
+      "toastSub": "4 בוטים · 6 m-"
     },
     {
       "id": "news",
       "num": 4,
       "name": "חדשות וסיכומים",
-      "depthLabel": "News Desk · -29 m",
+      "depthLabel": "29 m-",
       "bots": [
         {
           "id": "lee",
@@ -115,13 +117,15 @@
             "y": 0.3
           }
         }
-      ]
+      ],
+      "toastLine": "קומה 4 · חדשות וסיכומים",
+      "toastSub": "4 בוטים · 29 m-"
     },
     {
       "id": "english",
       "num": 3,
       "name": "לימוד אנגלית",
-      "depthLabel": "Language Lab · -52 m",
+      "depthLabel": "52 m-",
       "bots": [
         {
           "id": "remus",
@@ -147,13 +151,15 @@
             "y": 0.32
           }
         }
-      ]
+      ],
+      "toastLine": "קומה 3 · לימוד אנגלית",
+      "toastSub": "2 בוטים · 52 m-"
     },
     {
       "id": "home",
       "num": 2,
       "name": "בית, בריאות וקניות",
-      "depthLabel": "Home Ops · -78 m",
+      "depthLabel": "78 m-",
       "bots": [
         {
           "id": "olive",
@@ -203,13 +209,15 @@
             "y": 0.42
           }
         }
-      ]
+      ],
+      "toastLine": "קומה 2 · בית, בריאות וקניות",
+      "toastSub": "4 בוטים · 78 m-"
     },
     {
       "id": "dev",
       "num": 1,
       "name": "פיתוח, AI ווידאו",
-      "depthLabel": "Build Lab · -110 m",
+      "depthLabel": "110 m-",
       "bots": [
         {
           "id": "hermione",
@@ -247,7 +255,11 @@
             "y": 0.3
           }
         }
-      ]
+      ],
+      "toastLine": "קומה 1 · פיתוח, AI ווידאו",
+      "toastSub": "3 בוטים · 110 m-"
     }
-  ]
+  ],
+  "idleCount": 9,
+  "botCount": 17
 }
