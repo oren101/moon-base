@@ -65,8 +65,8 @@ const camera = new THREE.OrthographicCamera(
   (-frustumSize * aspect()) / 2, (frustumSize * aspect()) / 2,
   frustumSize / 2, -frustumSize / 2, 0.1, 250,
 );
-camera.position.set(24, 18, 24);
-camera.lookAt(0, -4, 0);
+camera.position.set(24, 16, 24);
+camera.lookAt(0, -2.5, 0);
 
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
@@ -75,7 +75,7 @@ controls.minZoom = 0.35;
 controls.maxZoom = 3.5;
 controls.maxPolarAngle = Math.PI * 0.49;
 controls.minPolarAngle = Math.PI * 0.12;
-controls.target.set(0, -4, 0);
+controls.target.set(0, -2.5, 0);
 controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
 
 const composer = new EffectComposer(renderer);
@@ -155,7 +155,7 @@ function addStars(n = 700) {
 function makeEarth() {
   const g = new THREE.Group();
   const body = new THREE.Mesh(
-    new THREE.SphereGeometry(2.4, 32, 32),
+    new THREE.SphereGeometry(3.2, 32, 32),
     new THREE.MeshStandardMaterial({ color: 0x2a7fd4, roughness: 0.5, emissive: 0x0a3060, emissiveIntensity: 0.55 }),
   );
   g.add(body);
@@ -164,34 +164,62 @@ function makeEarth() {
     const land = new THREE.Mesh(new THREE.SphereGeometry(0.45 + Math.random() * 0.4, 12, 12), landMat);
     const lat = (Math.random() - 0.5) * Math.PI;
     const lon = Math.random() * Math.PI * 2;
-    land.position.set(Math.cos(lat) * Math.cos(lon) * 2.3, Math.sin(lat) * 2.3, Math.cos(lat) * Math.sin(lon) * 2.3);
+    land.position.set(Math.cos(lat) * Math.cos(lon) * 3.05, Math.sin(lat) * 3.05, Math.cos(lat) * Math.sin(lon) * 3.05);
     land.scale.set(1, 0.5, 1);
     g.add(land);
   }
   g.add(new THREE.Mesh(
-    new THREE.SphereGeometry(2.65, 24, 24),
+    new THREE.SphereGeometry(3.5, 24, 24),
     new THREE.MeshBasicMaterial({ color: 0x7ec8ff, transparent: true, opacity: 0.14 }),
   ));
   // Place firmly in upper-right of overview frustum
-  g.position.set(16, 14, -6);
+  g.position.set(9, 10, -3);
   scene.add(g);
   return g;
 }
 
 function makeSun() {
   const g = new THREE.Group();
-  g.add(new THREE.Mesh(new THREE.SphereGeometry(1.1, 24, 24), new THREE.MeshBasicMaterial({ color: 0xffe566 })));
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(1.6, 24, 24), new THREE.MeshBasicMaterial({ color: 0xffe566 })));
   g.add(new THREE.Mesh(
-    new THREE.SphereGeometry(2.2, 16, 16),
+    new THREE.SphereGeometry(3.0, 16, 16),
     new THREE.MeshBasicMaterial({ color: 0xffcc44, transparent: true, opacity: 0.28 }),
   ));
   g.add(new THREE.Mesh(
-    new THREE.SphereGeometry(3.4, 12, 12),
+    new THREE.SphereGeometry(4.5, 12, 12),
     new THREE.MeshBasicMaterial({ color: 0xffaa22, transparent: true, opacity: 0.1 }),
   ));
-  g.position.set(-18, 15, 8);
+  g.position.set(-10, 11, 6);
   scene.add(g);
   return g;
+}
+
+function createDecoBlob(colorHex) {
+  const group = new THREE.Group();
+  const col = new THREE.Color(colorHex);
+  const body = new THREE.Mesh(
+    new THREE.SphereGeometry(0.55, 16, 16),
+    new THREE.MeshStandardMaterial({ color: col, roughness: 0.3, emissive: col, emissiveIntensity: 0.7 }),
+  );
+  body.scale.set(1, 1.25, 1);
+  group.add(body);
+  const shell = new THREE.Mesh(
+    new THREE.SphereGeometry(0.6, 12, 12),
+    new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.45 }),
+  );
+  shell.scale.set(1, 1.25, 1);
+  group.add(shell);
+  for (const sx of [-0.15, 0.15]) {
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+    eye.position.set(sx, 0.15, 0.42);
+    group.add(eye);
+  }
+  const disc = new THREE.Mesh(
+    new THREE.CircleGeometry(0.7, 16),
+    new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.3, depthWrite: false }),
+  );
+  disc.rotation.x = -Math.PI / 2; disc.position.y = 0.02; group.add(disc);
+  return group;
 }
 
 function createBlobBot(colorHex, status) {
@@ -507,6 +535,22 @@ function buildRockBlock(eclipseMode) {
   );
   dish.position.set(5.5, 1.65, -2.5); dish.rotation.x = Math.PI; root.add(dish);
 
+  // rock shelves between floors (cutaway strata shelves)
+  for (let i = 0; i < 5; i++) {
+    const shelf = new THREE.Mesh(
+      new THREE.BoxGeometry(2.2, 0.55, D * 0.85),
+      new THREE.MeshStandardMaterial({ color: rockColor(eclipseMode, i % 2 === 0), roughness: 0.95, flatShading: true }),
+    );
+    shelf.position.set(-W / 2 + 0.4, -1.2 - i * 2.85, 0);
+    root.add(shelf);
+    const shelfB = new THREE.Mesh(
+      new THREE.BoxGeometry(W * 0.9, 0.55, 1.6),
+      new THREE.MeshStandardMaterial({ color: rockColor(eclipseMode, i % 2 === 1), roughness: 0.95, flatShading: true }),
+    );
+    shelfB.position.set(0, -1.2 - i * 2.85, -D / 2 + 0.5);
+    root.add(shelfB);
+  }
+
   // small rover
   const rover = new THREE.Mesh(
     new THREE.BoxGeometry(1.1, 0.35, 0.7),
@@ -524,14 +568,21 @@ const FLOOR_D = 10.2;
 function floorY(fi) { return -1.5 - fi * FLOOR_H; }
 
 function decorateFloorDensity(floorG, eclipseMode, fi) {
-  // rows of empty desks for density (extra furniture beyond bot desks)
-  for (let row = 0; row < 2; row++) {
-    for (let col = 0; col < 3; col++) {
-      if (row === 0 && col < 2) continue; // leave room for bots
-      const d = makeDesk(eclipseMode, col === 1);
-      d.position.set(-4.5 + col * 3.2, 0.1, -2.8 + row * 2.4);
-      d.scale.setScalar(0.85);
+  // dense desk grid filling the floor
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < 4; col++) {
+      const d = makeDesk(eclipseMode, true);
+      d.position.set(-5.2 + col * 3.3, 0.1, -3.2 + row * 2.0);
+      d.scale.setScalar(0.9);
       floorG.add(d);
+      // idle glow blob deco on back rows (not clickable)
+      if (row < 2) {
+        const decoCols = ['#7cffb2', '#5ad4ff', '#ff9f1c', '#f15bb5', '#9b5de5'];
+        const deco = createDecoBlob(decoCols[(col + row + fi) % decoCols.length]);
+        deco.position.set(-5.2 + col * 3.3, 0.85, -3.2 + row * 2.0 + 0.55);
+        deco.scale.setScalar(1.05);
+        floorG.add(deco);
+      }
     }
   }
   // partitions
@@ -631,19 +682,19 @@ function buildFloors(data, eclipseMode) {
     // Bot desks — packed toward camera (+Z) so they read in overview
     const n = floor.bots.length;
     floor.bots.forEach((bot, bi) => {
-      const t = n === 1 ? 0.5 : bi / (n - 1);
-      const dx = -5.2 + t * 10.4;
-      const deskZ = 1.0 + (bot.desk?.y ?? 0.4) * 1.2;
+      const t = n === 1 ? 0.5 : bi / Math.max(1, n - 1);
+      const dx = -5.0 + t * 10.0;
+      const deskZ = 2.6; // front row toward camera
 
       const desk = makeDesk(eclipseMode, true);
       desk.position.set(dx, 0.1, deskZ);
       floorG.add(desk);
 
       const blob = createBlobBot(bot.color, bot.status);
-      blob.position.set(dx, 0.95, deskZ + 0.65);
-      blob.scale.setScalar(1.35);
+      blob.position.set(dx, 1.05, deskZ + 0.7);
+      blob.scale.setScalar(1.85);
       blob.userData.botId = bot.id;
-      blob.userData.baseY = 0.95;
+      blob.userData.baseY = 1.05;
       blob.userData.phase = bi * 1.7 + fi;
       const hit = new THREE.Mesh(
         new THREE.SphereGeometry(0.9, 8, 8),
@@ -688,28 +739,39 @@ function buildChamber(eclipseMode) {
     g.add(rock);
   }
 
-  // cave rim walls — low and open, not tall pillars
-  for (let i = 0; i < 6; i++) {
-    const wall = new THREE.Mesh(
-      new THREE.BoxGeometry(2.8, 2.2 + Math.random() * 1.2, 1.4),
-      rockMat,
+  // low cave backdrop only behind monolith
+  const backWall = new THREE.Mesh(
+    new THREE.BoxGeometry(7, 5.5, 1.2),
+    rockMat,
+  );
+  backWall.position.set(0, 2.4, -4.2);
+  g.add(backWall);
+  for (let i = 0; i < 4; i++) {
+    const strata = new THREE.Mesh(
+      new THREE.BoxGeometry(7.2, 0.35, 1.3),
+      new THREE.MeshStandardMaterial({ color: eclipseMode ? 0x3a1818 : 0x3a322e, roughness: 1, flatShading: true }),
     );
-    const a = (i / 6) * Math.PI * 2 + 0.2;
-    wall.position.set(Math.cos(a) * 5.2, 1.0, Math.sin(a) * 5.2);
-    wall.lookAt(0, 1, 0);
-    g.add(wall);
+    strata.position.set(0, 0.8 + i * 1.1, -4.2);
+    g.add(strata);
   }
 
   // SINGLE monolith
   const mono = new THREE.Mesh(
-    new THREE.BoxGeometry(1.15, 4.2, 0.45),
+    new THREE.BoxGeometry(1.3, 4.6, 0.5),
     new THREE.MeshStandardMaterial({
-      color: 0x050508, metalness: 0.92, roughness: 0.15,
-      emissive: 0x1a1a22, emissiveIntensity: 0.35,
+      color: 0x030305, metalness: 0.95, roughness: 0.12,
+      emissive: 0x222228, emissiveIntensity: 0.4,
     }),
   );
-  mono.position.y = 2.2; mono.castShadow = true; mono.userData.isMonolith = true;
+  mono.position.y = 2.4; mono.castShadow = true; mono.userData.isMonolith = true;
   g.add(mono);
+  // thin gold rim light plane behind
+  const rimPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.6, 5.0),
+    new THREE.MeshBasicMaterial({ color: 0xffaa55, transparent: true, opacity: 0.35 }),
+  );
+  rimPlane.position.set(0, 2.4, -0.4);
+  g.add(rimPlane);
   monolithMesh = mono;
   clickables.push(mono);
 
@@ -841,7 +903,7 @@ function flyToOverview() {
   setFloorVisibility(null);
   scene.fog.density = eclipse ? 0.012 : 0.008;
   // Pull back enough for Earth (TR) + Sun (TL) + full cutaway on portrait
-  startCamTween(new THREE.Vector3(26, 20, 26), new THREE.Vector3(0, -4, 0), 0.72);
+  startCamTween(new THREE.Vector3(24, 16, 24), new THREE.Vector3(0, -2.5, 0), 0.68);
   updateToastDefault(); updateFloorPicker(); hideApprove(); closeBotPanel();
 }
 
@@ -857,7 +919,7 @@ function flyToFloor(num) {
   const fi = DATA.floors.findIndex((f) => f.num === num);
   const y = floorY(fi) + 0.7;
   // Portrait-safe: lower zoom, look into office from corner
-  startCamTween(new THREE.Vector3(12, y + 5.5, 13), new THREE.Vector3(0, y + 1.1, 0.5), 0.88, 1.15);
+  startCamTween(new THREE.Vector3(11, y + 4.0, 12), new THREE.Vector3(0, y + 1.2, 1.0), 0.82, 1.15);
   const floor = DATA.floors.find((f) => f.num === num);
   setToast(floor.toastLine || floor.name, floor.toastSub || `${floor.bots.length} בוטים`);
   updateFloorPicker(); hideApprove(); closeBotPanel();
@@ -871,7 +933,7 @@ function flyToChamber() {
   if (rocketGroup) rocketGroup.visible = false;
   if (signMesh) signMesh.visible = false;
   scene.fog.density = 0.002;
-  startCamTween(new THREE.Vector3(8, -13.8, 9), new THREE.Vector3(0, -15.0, 0), 0.95, 1.2);
+  startCamTween(new THREE.Vector3(7.5, -14.2, 8.5), new THREE.Vector3(0, -15.0, 0.2), 0.9, 1.2);
   setToast('TMA-1', 'סטטוס: מחכה. כבר 3.6 מיליארד שנים.');
   showApprove(); updateFloorPicker(); closeBotPanel();
 }
