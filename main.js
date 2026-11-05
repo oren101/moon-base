@@ -228,7 +228,7 @@ function makeDesk(eclipseMode) {
     const frame = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.36, 0.05), new THREE.MeshStandardMaterial({ color: 0x0c0c12, emissive: screenCol, emissiveIntensity: 0.35 }));
     frame.position.set(ox, 0.78, -0.22);
     g.add(frame);
-    const glow = new THREE.Mesh(new THREE.PlaneGeometry(0.44, 0.3), new THREE.MeshBasicMaterial({ color: screenCol, transparent: true, opacity: 0.7 }));
+    const glow = new THREE.Mesh(new THREE.PlaneGeometry(0.44, 0.3), new THREE.MeshBasicMaterial({ color: screenCol, transparent: true, opacity: 0.95 }));
     glow.position.set(ox, 0.78, -0.18);
     g.add(glow);
   }
@@ -492,11 +492,19 @@ function buildFloors(data, eclipseMode) {
       desk.position.set(dx, 0.1, dz);
       floorG.add(desk);
 
+      // chair
+      const chair = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.22, 0.25, 0.12, 14),
+        new THREE.MeshStandardMaterial({ color: eclipseMode ? 0x1a1010 : 0x1a1a22, roughness: 0.5 })
+      );
+      chair.position.set(dx, 0.28, dz + 0.55);
+      floorG.add(chair);
+
       const blob = createBlobBot(bot.color, bot.status);
-      blob.position.set(dx, 0.72, dz + 0.45);
-      blob.scale.setScalar(1.15);
+      blob.position.set(dx, 0.78, dz + 0.55);
+      blob.scale.setScalar(1.25);
       blob.userData.botId = bot.id;
-      blob.userData.baseY = 0.72;
+      blob.userData.baseY = 0.78;
       blob.userData.phase = bi * 1.7 + fi;
       // hit proxy
       const hit = new THREE.Mesh(
@@ -652,9 +660,15 @@ function setFloorVisibility(activeNum) {
   if (!floorsRoot) return;
   floorsRoot.children.forEach((ch) => {
     if (ch.userData && ch.userData.floorNum != null) {
-      ch.visible = activeNum == null || ch.userData.floorNum === activeNum;
+      const on = activeNum == null || ch.userData.floorNum === activeNum;
+      ch.visible = on;
+      ch.traverse((o) => {
+        if (o.isMesh && o.material && !o.material.map) {
+          // no-op; visibility handles it
+        }
+      });
     } else {
-      ch.visible = activeNum == null; // elevator only in overview
+      ch.visible = true; // keep elevator
     }
   });
 }
@@ -663,14 +677,14 @@ function flyToFloor(num) {
   viewMode = 'floor'; activeFloorNum = num;
   if (chamberGroup) chamberGroup.visible = false;
   if (floorsRoot) floorsRoot.visible = true;
-  if (rockRoot) rockRoot.visible = false;
+  if (rockRoot) rockRoot.visible = true;
   if (rocketGroup) rocketGroup.visible = false;
   if (signMesh) signMesh.visible = false;
   setFloorVisibility(num);
   scene.fog.density = eclipse ? 0.014 : 0.01;
   const fi = DATA.floors.findIndex((f) => f.num === num);
   const y = floorY(fi) + 0.6;
-  startCamTween(new THREE.Vector3(7.5, y + 5.5, 8.5), new THREE.Vector3(0, y + 0.4, 0), 2.8, 1.15);
+  startCamTween(new THREE.Vector3(11, y + 8, 12), new THREE.Vector3(0, y + 0.6, 0), 1.05, 1.15);
   const floor = DATA.floors.find((f) => f.num === num);
   setToast(floor.name, floor.depthLabel + ' · ' + floor.bots.length + ' בוטים');
   updateFloorPicker(); hideApprove(); closeBotPanel();
@@ -684,7 +698,7 @@ function flyToChamber() {
   if (rocketGroup) rocketGroup.visible = false;
   if (signMesh) signMesh.visible = false;
   scene.fog.density = 0.002;
-  startCamTween(new THREE.Vector3(6.5, -13.2, 7.5), new THREE.Vector3(0, -14.8, 0), 2.4, 1.2);
+  startCamTween(new THREE.Vector3(9, -12.5, 10), new THREE.Vector3(0, -15.2, 0), 1.15, 1.2);
   setToast('TMA-1', 'סטטוס: מחכה. כבר 3.6 מיליארד שנים.');
   showApprove(); updateFloorPicker(); closeBotPanel();
 }
